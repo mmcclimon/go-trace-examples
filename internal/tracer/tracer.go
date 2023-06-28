@@ -16,7 +16,7 @@ type Tracer struct {
 	wg       sync.WaitGroup
 }
 
-type TracerFunc func(context.Context, *sync.WaitGroup, int)
+type TracerFunc func(context.Context, int)
 
 func StartTracing(traceFilename string) *Tracer {
 	err := os.Mkdir("traces", 0755)
@@ -53,9 +53,14 @@ func (t *Tracer) RunRoutines(n int, fn TracerFunc) {
 
 	for i := 0; i < n; i++ {
 		t.wg.Add(1)
-		go fn(t.C, &t.wg, i)
+		go t.RunOneRoutine(fn, i)
 	}
 
 	t.wg.Wait()
 	log.Println("routines finished")
+}
+
+func (t *Tracer) RunOneRoutine(fn TracerFunc, routineNum int) {
+	defer t.wg.Done()
+	fn(t.C, routineNum)
 }

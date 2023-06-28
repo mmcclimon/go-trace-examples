@@ -4,15 +4,12 @@ import (
 	"context"
 	"log"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/mmcclimon/go-trace-examples/internal/tracer"
 )
 
-func RandSleep(ctx context.Context, wg *sync.WaitGroup, i int) {
-	defer wg.Done()
-
+func RandSleep(ctx context.Context, i int) {
 	interval := time.Duration(rand.Intn(2500)+500) * time.Millisecond
 	ticker := time.NewTicker(interval)
 
@@ -26,9 +23,7 @@ func RandSleep(ctx context.Context, wg *sync.WaitGroup, i int) {
 	}
 }
 
-func BusyLoop(ctx context.Context, wg *sync.WaitGroup, i int) {
-	defer wg.Done()
-
+func BusyLoop(ctx context.Context, i int) {
 	sum := 0
 
 	for {
@@ -45,9 +40,7 @@ func BusyLoop(ctx context.Context, wg *sync.WaitGroup, i int) {
 }
 
 func StressGC(sliceLen int) tracer.TracerFunc {
-	return func(ctx context.Context, wg *sync.WaitGroup, i int) {
-		defer wg.Done()
-
+	return func(ctx context.Context, i int) {
 		appends := 0
 
 		for {

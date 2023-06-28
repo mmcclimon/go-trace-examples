@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"math/rand"
+	"net/http"
 	"time"
 
 	"github.com/mmcclimon/go-trace-examples/internal/tracer"
@@ -55,6 +56,28 @@ func StressGC(sliceLen int) tracer.TracerFunc {
 				}
 
 				appends += len(s)
+			}
+		}
+	}
+}
+
+func Network(url string) tracer.TracerFunc {
+	return func(ctx context.Context, i int) {
+		requests := 0
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.Printf("routine %d: did %d requests", i, requests)
+				return
+			default:
+				// This is obviously not a production-ready HTTP client...
+				_, err := http.Get(url)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				requests++
 			}
 		}
 	}

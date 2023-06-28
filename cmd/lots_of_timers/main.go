@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	util.Main("idle-timer", 8, util.RandSleep)
+	util.Main("lots-of-timers", 1024, util.RandSleep)
 }

@@ -23,3 +23,21 @@ func RandSleep(ctx context.Context, wg *sync.WaitGroup, i int) {
 		}
 	}
 }
+
+func BusyLoop(ctx context.Context, wg *sync.WaitGroup, i int) {
+	defer wg.Done()
+
+	sum := 0
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("routine %d: got up to %e", i, float64(sum))
+			return
+		default:
+			for i := 0; i < 10_000; i++ {
+				sum++
+			}
+		}
+	}
+}

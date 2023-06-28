@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/mmcclimon/go-trace-examples/internal/tracer"
 )
 
 func RandSleep(ctx context.Context, wg *sync.WaitGroup, i int) {
@@ -37,6 +39,29 @@ func BusyLoop(ctx context.Context, wg *sync.WaitGroup, i int) {
 		default:
 			for i := 0; i < 10_000; i++ {
 				sum++
+			}
+		}
+	}
+}
+
+func StressGC(sliceLen int) tracer.TracerFunc {
+	return func(ctx context.Context, wg *sync.WaitGroup, i int) {
+		defer wg.Done()
+
+		appends := 0
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.Printf("routine %d: appended %e ", i, float64(appends))
+				return
+			default:
+				s := make([]int, 0)
+				for i := 0; i < sliceLen; i++ {
+					s = append(s, i)
+				}
+
+				appends += len(s)
 			}
 		}
 	}

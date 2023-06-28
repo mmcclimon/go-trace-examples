@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/mmcclimon/go-trace-examples/internal/util"
+	"github.com/mmcclimon/go-trace-examples/internal/tracer"
+	"github.com/mmcclimon/go-trace-examples/internal/workloads"
 )
 
 func main() {
-	util.Main("lots-of-timers", 1024, util.RandSleep)
+	tracer.Main("lots-of-timers", 1024, workloads.RandSleep)
 }

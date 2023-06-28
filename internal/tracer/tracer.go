@@ -1,4 +1,4 @@
-package util
+package tracer
 
 import (
 	"context"
@@ -8,15 +8,6 @@ import (
 	"sync"
 	"time"
 )
-
-func Main(filename string, numRoutines int, action TracerFunc) {
-	tracer := StartTracing(filename)
-	defer tracer.Stop()
-
-	tracer.RunRoutines(numRoutines, action)
-
-	log.Printf("output written to %s", tracer.Filename)
-}
 
 type Tracer struct {
 	Filename string

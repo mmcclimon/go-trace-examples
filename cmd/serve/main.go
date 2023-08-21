@@ -86,14 +86,24 @@ func startTraceServers(ctx context.Context, wg *sync.WaitGroup) []trace {
 		path := filepath.Join("traces", t.Name)
 		args := []string{"tool", "trace", addr, path}
 
-		cmd := exec.CommandContext(ctx, "go", args...)
+		goCmd := "go"
+
+		if t.Name == "superstress-gc.trace" {
+			if _, err := exec.LookPath("gotip"); err == nil {
+				goCmd = "gotip"
+			} else {
+				log.Println("cannot find gotip in path; superstress-gc trace might fail")
+			}
+		}
+
+		cmd := exec.CommandContext(ctx, goCmd, args...)
 		cmd.Cancel = func() error {
 			log.Println("killing process for " + t.Name)
 			wg.Done()
 			return cmd.Process.Kill()
 		}
 
-		log.Println("run: go " + strings.Join(args, " "))
+		log.Println("run:", goCmd, strings.Join(args, " "))
 
 		err = cmd.Start()
 		ordie(err)
